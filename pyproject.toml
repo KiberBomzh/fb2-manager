@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=45", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fb2-manager"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "lxml>=6.0.2",
+    "rich>=14.2.0",
+]
+
+[project.scripts]
+fb2-manager = "src.cli:main"
+
+[tool.setuptools]
+packages = ["src"]

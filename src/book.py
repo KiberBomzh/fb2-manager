@@ -3,6 +3,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from src.metadata_reader import get_meta
+from src.template_handler import main as get_name
 
 
 def get_free_path(path):
@@ -58,6 +59,40 @@ class Book():
         self.path.unlink()
         self.path = book_path
         self.is_zip = False
+    
+    
+    def rename(self, template):
+        name = get_name(self.get_meta(), template)
+        if not name:
+            return
+        
+        if self.is_zip:
+            new_path = self.path.parent / (name + '.fb2.zip')
+        else:
+            new_path = self.path.parent / (name + '.fb2')
+        
+        if self.path != new_path and not new_path.exists():
+            self.path = self.path.rename(new_path)
+    
+    
+    def sort(self, main_path, template):
+        path_parts = get_name(self.get_meta(), template)
+        if not isinstance(path_parts, list):
+            path_parts = [path_parts]
+        
+        
+        if self.is_zip:
+            new_path = main_path / ('/'.join(path_parts) + '.fb2.zip')
+        else:
+            new_path = main_path / ('/'.join(path_parts) + '.fb2')
+        
+        
+        if not new_path.parent.exists():
+            new_path.parent.mkdir(parents = True)
+        
+        if self.path != new_path:
+            self.path = self.path.replace(new_path)
+    
     
     
     def get_meta(self):

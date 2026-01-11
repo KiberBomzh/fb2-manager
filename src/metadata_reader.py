@@ -6,9 +6,9 @@ ns = {'fb': "http://www.gribuser.ru/xml/fictionbook/2.0"}
 def get_title(t_info):
     title = t_info.find('fb:book-title', namespaces = ns)
     if title is not None:
-        return title.text
+        return title.text if title.text is not None else ''
     else:
-        return None
+        return ''
 
 def get_authors(t_info):
     authors = t_info.xpath('./fb:author', namespaces = ns)
@@ -37,9 +37,9 @@ def get_authors(t_info):
 def get_language(t_info):
     lang = t_info.find('fb:lang', namespaces = ns)
     if lang is not None:
-        return lang.text
+        return lang.text if lang.text is not None else ''
     else:
-        return None
+        return ''
 
 def get_sequence(t_info):
     sequence = t_info.find('fb:sequence', namespaces = ns)
@@ -58,12 +58,21 @@ def get_sequence(t_info):
 def get_meta(book):
     root = etree.parse(book).getroot()
     t_info = root.find('fb:description/fb:title-info', namespaces = ns)
+    s = get_sequence(t_info)
+    sequence = ''
+    number = ''
+    if s:
+        if 'name' in s:
+            sequence = s['name']
+        if 'number' in s:
+            number = s['number']
     
     meta = {
         'title': get_title(t_info),
         'authors': get_authors(t_info),
         'language': get_language(t_info),
-        'sequence': get_sequence(t_info)
+        'sequence': sequence,
+        'number': number
     }
     
     return meta

@@ -1,52 +1,54 @@
-import sys
 from zipfile import ZipFile
 from pathlib import Path
 
-from src.metadata_extractor import get_meta
+from src.book import Book
 
 
-def unpack_zip(file_zip):
-    with ZipFile(file_zip, 'r') as b_r:
-        n_list = b_r.namelist()
-        if len(n_list) != 1:
-            return None
-        
-        book_name = n_list[0]
-        if Path(book_name).suffix.lower() != '.fb2':
-            return None
-        
-        b_r.extract(book_name, file_zip.parent)
+def is_zip_a_book(path):
+    with ZipFile(path, 'r') as book:
+        if len(book.namelist()) == 1:
+            first_file = book.namelist()[0]
+            if first_file.lower().endswith('.fb2'):
+                return True
     
-    book = file_zip.parent / book_name
-    file_zip.unlink()
-    return book
+    return False
 
-def read_dir(path, books, recursive = True):
-    for file in path.glob("*"):
+def read_dir(path, books, recursive):
+    if recursive:
+        p_iter = path.rglob("*")
+    else:
+        p_iter = path.glob("*")
+    
+    for file in p_iter:
         if not file.is_file():
             continue
         
         if file.suffix.lower() == '.fb2':
-            books[file] = get_meta(file)
+            books.append(Book(file))
         elif file.suffix.lower() == '.zip':
-            unpacked_file = unpack_zip(file)
-            
-            if unpacked_file is None:
-                continue
-            else:
-                books[unpacked_file] = get_meta(unpacked_file)
+            if is_zip_a_book(file):
+                books.append(Book(file, is_zip = True))
 
-def get_files(path):
-    books = {}
-    if path.exists():
-        if path.is_dir():
-            read_dir(path)
-        elif path.is_file():
-            if path.suffix.lower() == '.fb2':
-                books[path] = get_meta(path)
-            else:
-                raise ValueError(f"File {path} is not FB2!")
+
+def get_files(path, books, recursive):
+    if path.is_dir():
+        read_dir(path, books, recursive)
+    elif path.is_file():
+        if path.suffix.lower() == '.fb2':
+            books.append(Book(path))
+        elif path.suffix.lower() == '.zip':
+            if is_zip_a_book(path):
+                books.append(Book(path, is_zip = True))
+        else:
+            print(f"File {path} is not FB2!")
     else:
-        raise ValueError(f"Path {path} is not exists!")
+        print(f"Path {path} is not exists!")
+    
+
+
+def get_books(args):
+    books = []
+    for i in args.input:
+        get_files(Path(i).resolve(), books, args.recursive)
     
     return books

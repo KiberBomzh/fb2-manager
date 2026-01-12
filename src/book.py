@@ -93,6 +93,36 @@ class Book():
         if self.path != new_path:
             self.path = self.path.replace(new_path)
     
+
+    def print(self):
+        print(self.path.parent.name, self.path.name, sep = '/')
+        
+        meta = self.get_meta()
+        
+        
+        if meta['title']:
+            print("Title:", meta['title'].strip())
+        
+        if len(meta['authors']) > 1:
+            print("Authors:")
+            for aut in meta['authors']:
+                print(f"\t{aut.strip()}")
+        elif meta['authors']:
+            print("Author:", meta['authors'][0].strip())
+        
+        
+        if meta['sequence']:
+            print("Sequence:", meta['sequence'].strip(), end = ' ')
+            
+            if meta['number']:
+                print(meta['number'].strip())
+            else:
+                print()
+        
+        if meta['language']:
+            print("Language:", meta['language'].strip())
+
+
     
     
     def get_meta(self):

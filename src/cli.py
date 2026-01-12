@@ -55,35 +55,9 @@ def unzip_handler(args, books):
 
 def print_handler(args, books):
     for book in books:
-        print(book.path.parent.name, book.path.name, sep = '/')
-        
-        
-        meta = book.get_meta()
-        
-        
-        if meta['title']:
-            print("Title:", meta['title'])
-        
-        if len(meta['authors']) > 1:
-            print("Authors:")
-            for aut in meta['authors']:
-                print(f"\t{aut}")
-        elif meta['authors']:
-            print("Author:", meta['authors'][0])
-        
-        
-        if meta['sequence']:
-            print("Sequence:", meta['sequence'], end = ' ')
-            
-            if meta['number']:
-                print(meta['number'])
-            else:
-                print()
-        
-        if meta['language']:
-            print("Language:", meta['language'])
-        
-        print()
+        book.print()
+        if book != books[-1]:
+            print()
 
 
 def main():

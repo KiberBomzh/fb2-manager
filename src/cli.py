@@ -53,6 +53,38 @@ def unzip_handler(args, books):
     for book in books:
         book.unzip()
 
+def print_handler(args, books):
+    for book in books:
+        print(book.path.parent.name, book.path.name, sep = '/')
+        
+        
+        meta = book.get_meta()
+        
+        
+        if meta['title']:
+            print("Title:", meta['title'])
+        
+        if len(meta['authors']) > 1:
+            print("Authors:")
+            for aut in meta['authors']:
+                print(f"\t{aut}")
+        elif meta['authors']:
+            print("Author:", meta['authors'][0])
+        
+        
+        if meta['sequence']:
+            print("Sequence:", meta['sequence'], end = ' ')
+            
+            if meta['number']:
+                print(meta['number'])
+            else:
+                print()
+        
+        if meta['language']:
+            print("Language:", meta['language'])
+        
+        print()
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -94,6 +126,7 @@ def main():
     
     _zip_parser = subparsers.add_parser('zip', help = "Zip books")
     _unzip_parser = subparsers.add_parser('unzip', help = "Unzip books")
+    _print_parser = subparsers.add_parser('print', help = "Print metadata")
     
     args = parser.parse_args()
     
@@ -113,6 +146,8 @@ def main():
             zip_handler(args, books)
         case 'unzip':
             unzip_handler(args, books)
+        case 'print':
+            print_handler(args, books)
 
     
 

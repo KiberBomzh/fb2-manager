@@ -95,7 +95,7 @@ def unwrap_tag(name, tag, the_var):
     return name
 
 
-def unwrap_secondary_tags(name, meta):
+def unwrap_secondary_tags(name, meta, number_template):
     counter = 0
     while '*' in name:
         if counter > 100:
@@ -109,7 +109,7 @@ def unwrap_secondary_tags(name, meta):
         
         meta_value = meta[tag]
         if tag == 'number':
-            meta_value = number_templ_handl(meta_value)
+            meta_value = number_templ_handl(meta_value, number_template)
         
         
         name = unwrap_tag(name, '{' + tag, meta_value)
@@ -119,7 +119,7 @@ def unwrap_secondary_tags(name, meta):
     return name
 
 
-def number_templ_handl(number, template = '2|.|1'):
+def number_templ_handl(number, template):
     if not number:
         return number
     
@@ -131,6 +131,8 @@ def number_templ_handl(number, template = '2|.|1'):
         return number
     
     try:
+        if '.' not in number:
+            number += '.0'
         s_nums_start, s_nums_end = number.split('.')
     except ValueError:
         return number
@@ -156,7 +158,7 @@ def number_templ_handl(number, template = '2|.|1'):
     return number
 
 
-def get_name(meta, template):
+def get_name(meta, template, number_template):
     name = template
     
     while '{' in name:
@@ -167,23 +169,23 @@ def get_name(meta, template):
             
             
             if key == 'number':
-                value = number_templ_handl(value)
+                value = number_templ_handl(value, number_template)
             
             name = unwrap_tag(name, tag, value)
         
         if '*' in name:
-            name = unwrap_secondary_tags(name, meta)
+            name = unwrap_secondary_tags(name, meta, number_template)
     
     name = get_without_forbidden_chars(name)
     return name
 
-def main(meta, template):
+def main(meta, template, number_template):
     if isinstance(template, str):
         template = [template]
-    
+
     names = []
     for templ in template:
-        name = get_name(meta, templ)
+        name = get_name(meta, templ, number_template)
         if name:
             names.append(name)
     

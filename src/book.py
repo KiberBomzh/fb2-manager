@@ -1,6 +1,7 @@
 from zipfile import ZipFile, ZIP_DEFLATED
 from pathlib import Path
 from tempfile import TemporaryDirectory
+import shutil
 
 from src.metadata_reader import get_meta
 from src.template_handler import main as get_name
@@ -47,13 +48,13 @@ class Book():
         book_path = get_free_path(self.path.parent / (name + '.fb2'))
         
         with TemporaryDirectory() as temp_dir:
-            temp_path = Path(temp_dir)
+            temp_path = Path(temp_dir).resolve()
             with ZipFile(self.path, 'r') as book_read:
                 first_file = book_read.namelist()[0]
                 book_read.extract(first_file, temp_path)
             
             extracted_file = temp_path / first_file
-            extracted_file.replace(book_path)
+            shutil.move(extracted_file, book_path)
         
         
         self.path.unlink()
@@ -61,8 +62,8 @@ class Book():
         self.is_zip = False
     
     
-    def rename(self, template):
-        name = get_name(self.get_meta(), template)
+    def rename(self, template, number_template):
+        name = get_name(self.get_meta(), template, number_template)
         if not name:
             return
         
@@ -72,11 +73,11 @@ class Book():
             new_path = self.path.parent / (name + '.fb2')
         
         if self.path != new_path and not new_path.exists():
-            self.path = self.path.rename(new_path)
+            self.path = Path(shutil.move(self.path, new_path))
     
     
-    def sort(self, main_path, template):
-        path_parts = get_name(self.get_meta(), template)
+    def sort(self, main_path, template, number_template):
+        path_parts = get_name(self.get_meta(), template, number_template)
         if not isinstance(path_parts, list):
             path_parts = [path_parts]
         
@@ -90,8 +91,8 @@ class Book():
         if not new_path.parent.exists():
             new_path.parent.mkdir(parents = True)
         
-        if self.path != new_path:
-            self.path = self.path.replace(new_path)
+        if self.path != new_path and not new_path.exists():
+            self.path = Path(shutil.move(self.path, new_path))
     
 
     def print(self):

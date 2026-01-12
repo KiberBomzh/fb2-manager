@@ -20,7 +20,7 @@ def sort_handler(args, books):
         ]
     
     for book in books:
-        book.sort(main_path, args.template)
+        book.sort(main_path, args.template, args.number_template)
     
     if not args.keep_empty_folders:
         removed_any = True
@@ -39,7 +39,7 @@ def sort_handler(args, books):
 @yaspin(text = "Renaming...", color = 'green')
 def rename_handler(args, books):
     for book in books:
-        book.rename(args.template)
+        book.rename(args.template, args.number_template)
 
 
 @yaspin(text = "Compression...", color = 'green')
@@ -89,6 +89,9 @@ def main():
     sort_parser.add_argument('-t', '--template', 
         action = 'append', default = [], 
         help = "Template for sort")
+    sort_parser.add_argument('-n', '--number-template',
+        type = str, default = '2|.|1',
+        help = "Template for sequence's number")
     sort_parser.add_argument('--keep-empty-folders', 
         action = 'store_true', 
         help = "Do NOT remove empty folders in main path")
@@ -97,6 +100,9 @@ def main():
     rename_parser.add_argument('-t', '--template', 
         type = str, default = '{authors&/ - }{sequence/ <number*(|)/, >}{title/}', 
         help = "Template for renaming")
+    rename_parser.add_argument('-n', '--number-template',
+        type = str, default = '2|.|1',
+        help = "Template for sequence's number")
     
     _zip_parser = subparsers.add_parser('zip', help = "Zip books")
     _unzip_parser = subparsers.add_parser('unzip', help = "Unzip books")

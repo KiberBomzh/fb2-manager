@@ -12,6 +12,7 @@ from src.input_handler import get_books
 @yaspin(text = "Sorting...", color = 'green')
 def sort_handler(args, books):
     main_path = Path(args.main_path)
+    
     if not args.template:
         args.template = [
             '{authors1}',
@@ -67,7 +68,7 @@ def main():
     
     
     parser.add_argument('-i', '--input',
-        action = 'append', default = [], required = True, 
+        action = 'append', default = [], 
         help = "Input files (books) or directories with books")
     
     parser.add_argument('-r', '--recursive',
@@ -84,7 +85,7 @@ def main():
     
     sort_parser = subparsers.add_parser('sort', help = "Sort books in folders structure")
     sort_parser.add_argument('-p', '--main-path',
-        required = True,
+        default = '.',
         help = "Main path for sort")
     sort_parser.add_argument('-t', '--template', 
         action = 'append', default = [], 
@@ -109,6 +110,9 @@ def main():
     _print_parser = subparsers.add_parser('print', help = "Print metadata")
     
     args = parser.parse_args()
+
+    if not args.input:
+        args.input.append('.')
     
     try:
         books = get_books(args)

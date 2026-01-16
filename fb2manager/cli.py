@@ -5,7 +5,7 @@ from pathlib import Path
 from yaspin import yaspin
 
 
-from src.input_handler import get_books
+from fb2manager.input_handler import get_books
 
 
 
@@ -53,6 +53,11 @@ def zip_handler(args, books):
 def unzip_handler(args, books):
     for book in books:
         book.unzip()
+
+@yaspin(text = "Prettifying...", color = 'green')
+def pretty_handler(args, books):
+    for book in books:
+        book.prettify()
 
 def print_handler(args, books):
     for book in books:
@@ -107,6 +112,7 @@ def main():
     
     _zip_parser = subparsers.add_parser('zip', help = "Zip books")
     _unzip_parser = subparsers.add_parser('unzip', help = "Unzip books")
+    _pretty_parser = subparsers.add_parser('pretty', help = "Prettify books")
     _print_parser = subparsers.add_parser('print', help = "Print metadata")
     
     args = parser.parse_args()
@@ -130,6 +136,8 @@ def main():
             zip_handler(args, books)
         case 'unzip':
             unzip_handler(args, books)
+        case 'pretty':
+            pretty_handler(args, books)
         case 'print':
             print_handler(args, books)
 

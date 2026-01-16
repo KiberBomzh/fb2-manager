@@ -1,7 +1,7 @@
 from zipfile import ZipFile
 from pathlib import Path
 
-from src.book import Book
+from fb2manager.book import Book
 
 
 def is_zip_a_book(path):

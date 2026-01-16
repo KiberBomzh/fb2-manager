@@ -3,8 +3,9 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 import shutil
 
-from src.metadata_reader import get_meta
-from src.template_handler import main as get_name
+from fb2manager.metadata_reader import get_meta
+from fb2manager.template_handler import main as get_name
+from formatter import prettify
 
 
 def get_free_path(path):
@@ -94,6 +95,23 @@ class Book():
         if self.path != new_path and not new_path.exists():
             self.path = Path(shutil.move(self.path, new_path))
     
+
+    def prettify(self):
+        if self.is_zip:
+            with TemporaryDirectory() as temp_dir:
+                temp_path = Path(temp_dir).resolve()
+                with ZipFile(self.path, 'r') as book_read:
+                    first_file = book_read.namelist()[0]
+                    book_read.extract(first_file, temp_path)
+            
+                extracted_file = temp_path / first_file
+                prettify(str(extracted_file))
+                
+                with ZipFile(self.path, 'w') as book_write:
+                    book_write.write(extracted_file, arcname = extracted_file.name)
+        else:
+            prettify(str(self.path))
+
 
     def print(self):
         print(self.path.parent.name, self.path.name, sep = '/')

@@ -1,20 +1,27 @@
 [build-system]
-requires = ["setuptools>=45", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["maturin>=1.10,<2.0"]
+build-backend = "maturin"
 
 [project]
 name = "fb2-manager"
-version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+]
+dynamic = ["version"]
 dependencies = [
     "lxml>=6.0.2",
     "yaspin>=3.4.0",
 ]
 
 [project.scripts]
-fb2-manager = "src.cli:main"
+fb2-manager = "fb2manager.cli:main"
 
-[tool.setuptools]
-packages = ["src"]
+[tool.maturin]
+module-name = "formatter"
+manifest-path = "formatter/Cargo.toml"
+python-packages = ["fb2manager"]
